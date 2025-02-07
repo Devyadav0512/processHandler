@@ -1,5 +1,8 @@
 package jobhandler
 
-func SlowJobHandler() {
+import "fmt"
 
+func SlowJobHandler() {
+	fmt.Println("Hello slow job")
+	slowJobsQueue = slowJobsQueue[:len(slowJobsQueue)-1]
 }
