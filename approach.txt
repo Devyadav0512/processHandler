@@ -1,0 +1,10 @@
+// array of jobs
+// job handler -> one by one -> job type handler
+
+job handler -> buffered channel 5 
+    job type array  
+    job type array  
+    job type array  
+
+worker -> array push -> start (one by one)
+logging

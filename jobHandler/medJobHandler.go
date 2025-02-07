@@ -1,0 +1,5 @@
+package jobhandler
+
+func MedJobHandler() {
+
+}
