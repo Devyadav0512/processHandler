@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	jobhandler "processhandler/jobHandler"
 	"processhandler/models"
 )
 
@@ -30,6 +28,5 @@ func main() {
 		},
 	}
 
-	jobhandler.Init(jobs)
-	fmt.Println("Hello world")
+	InitAllJobHandler(jobs)
 }

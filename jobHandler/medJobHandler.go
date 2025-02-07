@@ -1,8 +1,14 @@
-package jobhandler
+package jobHandler
 
-import "fmt"
+import (
+	"fmt"
+	"processhandler/models"
+	"time"
+)
 
-func MedJobHandler() {
-	fmt.Println("Hello med job")
-	mediumJobsQueue = mediumJobsQueue[:len(mediumJobsQueue)-1]
+func MedJobHandler(job *models.Job) bool {
+	fmt.Println("Job "+job.Id+" started - Type: "+job.Type, job.Payload)
+	time.Sleep(3 * time.Second)
+	fmt.Println("Job " + job.Id + " completed - Duration: 3000ms")
+	return true
 }

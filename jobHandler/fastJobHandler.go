@@ -1,8 +1,14 @@
-package jobhandler
+package jobHandler
 
-import "fmt"
+import (
+	"fmt"
+	"processhandler/models"
+	"time"
+)
 
-func FastJobHandler() {
-	fmt.Println("Hello fast job")
-	fastJobQueue = fastJobQueue[:len(fastJobQueue)-1]
+func FastJobHandler(job *models.Job) bool {
+	fmt.Println("Job "+job.Id+" started - Type: "+job.Type, job.Payload)
+	time.Sleep(1 * time.Second)
+	fmt.Println("Job " + job.Id + " completed - Duration: 1000ms")
+	return true
 }
