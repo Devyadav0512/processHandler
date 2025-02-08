@@ -5,7 +5,7 @@ import (
 	"processhandler/models"
 )
 
-func ExcpJobHandler(job *models.Job) bool {
-	fmt.Println("Job "+job.Id+" failed ---> "+job.Type, job.Payload)
+func ExcpJobHandler(job models.Job) bool {
+	fmt.Println("Job " + job.Id + " failed ---> " + job.Type)
 	return true
 }

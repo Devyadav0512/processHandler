@@ -1,6 +1,7 @@
 package main
 
 import (
+	"processhandler/jobsHandler"
 	"processhandler/models"
 )
 
@@ -28,5 +29,5 @@ func main() {
 		},
 	}
 
-	InitAllJobHandler(jobs)
+	jobsHandler.InitAllJobHandler(jobs)
 }

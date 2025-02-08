@@ -6,9 +6,11 @@ import (
 	"time"
 )
 
-func MedJobHandler(job *models.Job) bool {
-	fmt.Println("Job "+job.Id+" started - Type: "+job.Type, job.Payload)
+func MedJobHandler(job models.Job) bool {
+	fmt.Println("Job " + job.Id + " started - Type: " + job.Type)
+	start := time.Now()
 	time.Sleep(3 * time.Second)
-	fmt.Println("Job " + job.Id + " completed - Duration: 3000ms")
+	elapsed := time.Since(start)
+	fmt.Println("Job "+job.Id+" completed - Duration: ", elapsed)
 	return true
 }
