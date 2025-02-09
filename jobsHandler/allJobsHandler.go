@@ -1,6 +1,7 @@
 package jobsHandler
 
 import (
+	"fmt"
 	"processhandler/jobHandler"
 	"processhandler/models"
 	"processhandler/queue"
@@ -10,30 +11,39 @@ import (
 var jobWg sync.WaitGroup
 var excpWg sync.WaitGroup
 
-func InitAllJobHandler(jobs []models.Job) {
+func InitAllJobHandler(jobs []models.Job) []models.JobResult {
+	jobsResponse := models.Response{}
+
 	FastJobQueue := queue.NewQueue(5, "fast")
 	MedJobQueue := queue.NewQueue(5, "med")
 	SlowJobQueue := queue.NewQueue(5, "slow")
 	ExceptionQueue := queue.NewQueue(1, "excp")
 
+	queueArr := []queues{
+		{FastJobQueue, &jobWg, "fast", jobHandler.FastJobHandler, ExceptionQueue, true},
+		{MedJobQueue, &jobWg, "medium", jobHandler.MedJobHandler, ExceptionQueue, true},
+		{SlowJobQueue, &jobWg, "slow", jobHandler.SlowJobHandler, ExceptionQueue, true},
+		{ExceptionQueue, &excpWg, "excp", jobHandler.ExcpJobHandler, ExceptionQueue, false},
+	}
+
 	defer func() {
 		jobWg.Wait()
 		ExceptionQueue.Close()
+		CalculateStats(queueArr, &jobsResponse)
 		excpWg.Wait()
 	}()
 
 	jobWg.Add(6)
 	excpWg.Add(1)
 
-	go FastJobQueue.Subscribe(jobHandler.FastJobHandler, ExceptionQueue, &jobWg)
-	go MedJobQueue.Subscribe(jobHandler.MedJobHandler, ExceptionQueue, &jobWg)
-	go SlowJobQueue.Subscribe(jobHandler.SlowJobHandler, ExceptionQueue, &jobWg)
-	go ExceptionQueue.Subscribe(jobHandler.ExcpJobHandler, ExceptionQueue, &excpWg)
+	for _, q := range queueArr {
+		go q.queue.Subscribe(q.jobHandler, q.excpQueue, q.waitGrp)
+		if q.isJobQueue {
+			go AddJobs(jobs, q.queue, q.jobType)
+		}
+	}
 
-	go AddJobs(jobs, FastJobQueue, "fast")
-	go AddJobs(jobs, MedJobQueue, "medium")
-	go AddJobs(jobs, SlowJobQueue, "slow")
-
+	return jobsResponse.JobsResult
 }
 
 func AddJobs(jobs []models.Job, queue *queue.Queue, jobType string) {
@@ -47,4 +57,15 @@ func AddJobs(jobs []models.Job, queue *queue.Queue, jobType string) {
 			queue.Enqueue(job)
 		}
 	}
+}
+
+func CalculateStats(queueArr []queues, jobResponse *models.Response) {
+	for _, q := range queueArr {
+		if q.isJobQueue {
+			completedJobs, failedJobs := q.queue.Stats()
+			jobResponse.CompletedJobs += completedJobs
+			jobResponse.FailedJobs += failedJobs
+		}
+	}
+	fmt.Println("Total completed jobs: ", jobResponse.CompletedJobs, " failed jobs: ", jobResponse.FailedJobs)
 }
